@@ -22,37 +22,24 @@ const getAndSetChannelUsers = () => {
 }
 
 bot.on("start", () => {
-    getAndSetChannelUsers()
-
+    getAndSetChannelUsers();
     console.log(channelUsers);
 });
 
 
 bot.on("message", (data) => {
     const {user, channel, type, ts} = data;
-    const chanTestSpace = channel === "C01CBCG1Z7F";
     const isUserMessage = user && type === "message";
 
-    getAndSetChannelUsers()
-
-    // TEST WITH HENRY. COMMENT BACK IN TO SEE IF IT WORKS AFTER USER ADDED
-
-    // if (!(user in channelUsers)) {
-    //     channelUsers[user] = {msgCount : 0}
-    // }
+    getAndSetChannelUsers();
     
-    if (chanTestSpace && isUserMessage){
-        console.log(data)
+    if (isUserMessage){
         const {msgCount} = channelUsers[user];
 
         if (msgCount === 0) {
-            bot.postMessageToChannel('testing-space-for-making-a-slackbot', botResponses.generic, {thread_ts: ts});
+            bot.postMessage(channel, botResponses.generic, {thread_ts: ts});
         }
-
+        
+        channelUsers[user].msgCount++;
     }
-
-    if (isUserMessage) channelUsers[user].msgCount++;
-
-    console.log(channelUsers)
 });
-
