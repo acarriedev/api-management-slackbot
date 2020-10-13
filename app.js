@@ -1,14 +1,17 @@
-var SlackBot = require('slackbots');
+const SlackBot = require('slackbots');
+const { secretToken } = require("./secretToken")
+
+console.log(secretToken)
  
 // create a bot
-var bot = new SlackBot({
-    token: 'xoxb-1415778635398-1407884268359-yt0bQLTSMpvfxUnO8lOyyXJv', // Add a bot https://my.slack.com/services/new/bot and put the token 
+const bot = new SlackBot({
+    token: secretToken, // Add a bot https://my.slack.com/services/new/bot and put the token
     name: 'apim-helper'
 });
  
 bot.on('start', function() {
     // more information about additional params https://api.slack.com/methods/chat.postMessage
-    var params = {
+    const params = {
         icon_emoji: ':cat:'
     };
     
