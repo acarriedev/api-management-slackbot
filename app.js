@@ -17,7 +17,7 @@ const getAndSetChannelUsers = () => {
     const userData = bot.getUsers();
     const members = userData._value.members;
     members.forEach((member) => {
-        channelUsers[member.id] = {msgCount : 0};
+        if (!channelUsers[member.id]) channelUsers[member.id] = {msgCount : 0};
     })
 }
 
@@ -49,7 +49,10 @@ bot.on("message", (data) => {
             bot.postMessageToChannel('testing-space-for-making-a-slackbot', botResponses.generic, {thread_ts: ts});
         }
 
-        msgCount++;
     }
+
+    if (isUserMessage) channelUsers[user].msgCount++;
+
+    console.log(channelUsers)
 });
 
