@@ -6,13 +6,23 @@ const bot = new SlackBot({
     token: secretToken,
     name: "apim-helper2"
 });
+
+const botResponses = {
+    generic: "Hello, thank you for your message. Don't forget to check the API Management Producer support Confluence page at https://nhsd-confluence.digital.nhs.uk/display/APM/API+producer+zone"
+}
+
 const channelUsers = {};
 
-bot.on("start", () => {
-    const userData = bot.getUsers()._value.members;
-    userData.forEach((member) => {
+const getAndSetChannelUsers = () => {
+    const userData = bot.getUsers();
+    const members = userData._value.members;
+    members.forEach((member) => {
         channelUsers[member.id] = {msgCount : 0};
     })
+}
+
+bot.on("start", () => {
+    getAndSetChannelUsers()
 
     console.log(channelUsers);
 });
@@ -23,6 +33,8 @@ bot.on("message", (data) => {
     const chanTestSpace = channel === "C01CBCG1Z7F";
     const isUserMessage = user && type === "message";
 
+    getAndSetChannelUsers()
+
     // TEST WITH HENRY. COMMENT BACK IN TO SEE IF IT WORKS AFTER USER ADDED
 
     // if (!(user in channelUsers)) {
@@ -31,15 +43,13 @@ bot.on("message", (data) => {
     
     if (chanTestSpace && isUserMessage){
         console.log(data)
-        const chanUser = channelUsers[user];
+        const {msgCount} = channelUsers[user];
 
-        if (chanUser && chanUser.msgCount === 0) {
-            const confluenceRes = "Hello, thank you for your message. Don't forget to check the API Management Producer support Confluence page at https://nhsd-confluence.digital.nhs.uk/display/APM/API+producer+zone";
-
-            bot.postMessageToChannel('testing-space-for-making-a-slackbot', confluenceRes, {thread_ts: ts});
+        if (msgCount === 0) {
+            bot.postMessageToChannel('testing-space-for-making-a-slackbot', botResponses.generic, {thread_ts: ts});
         }
 
-        channelUsers[user]["msgCount"]++;
+        msgCount++;
     }
 });
 
