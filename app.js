@@ -1,9 +1,9 @@
 const SlackBot = require("slackbots");
-const { secretToken } = require("./secretToken");
+const { SECRET_TOKEN } = process.env;
 
 
 const bot = new SlackBot({
-    token: secretToken,
+    token: SECRET_TOKEN,
     name: "apim-helper2"
 });
 
