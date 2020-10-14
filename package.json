@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node listen.js"
+    "start": "node appWS.js"
   },
   "repository": {
     "type": "git",
@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/acarriedev/api-management-slackbot#readme",
   "dependencies": {
+    "@slack/events-api": "^2.3.4",
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "node-slack-upload": "^2.0.0",

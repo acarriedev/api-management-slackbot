@@ -1,11 +1,45 @@
-const express = require("express");
-const app = express();
-const cors = require("cors");
-const helperBotRouter = require("./routers/helperBot.router");
+const SlackBot = require("slackbots");
+const { SECRET_TOKEN } = process.env;
 
-app.use(cors());
-app.use(express.json());
 
-app.use("/helperbot", helperBotRouter);
+const bot = new SlackBot({
+    token: SECRET_TOKEN,
+    name: "apim-helper2"
+});
 
-module.exports = app;
+const botResponses = {
+    generic: "Hello, thank you for your message. Don't forget to check the API Management Producer support Confluence page at https://nhsd-confluence.digital.nhs.uk/display/APM/API+producer+zone"
+}
+
+const channelUsers = {};
+
+const getAndSetChannelUsers = () => {
+    const userData = bot.getUsers();
+    const members = userData._value.members;
+    members.forEach((member) => {
+        if (!channelUsers[member.id]) channelUsers[member.id] = {msgCount : 0};
+    })
+}
+
+bot.on("start", () => {
+    getAndSetChannelUsers();
+    console.log(channelUsers);
+});
+
+
+bot.on("message", (data) => {
+    const {user, channel, type, ts} = data;
+    const isUserMessage = user && type === "message";
+
+    getAndSetChannelUsers();
+    
+    if (isUserMessage){
+        const {msgCount} = channelUsers[user];
+
+        if (msgCount === 0) {
+            bot.postMessage(channel, botResponses.generic, {thread_ts: ts});
+        }
+        
+        channelUsers[user].msgCount++;
+    }
+});
