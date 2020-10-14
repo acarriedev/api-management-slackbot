@@ -4,8 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node app.js"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
@@ -19,6 +18,7 @@
   },
   "homepage": "https://github.com/acarriedev/api-management-slackbot#readme",
   "dependencies": {
+    "express": "^4.17.1",
     "node-slack-upload": "^2.0.0",
     "slackbots": "^1.2.0"
   },
