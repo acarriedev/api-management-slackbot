@@ -7,16 +7,54 @@ const token = process.env.SLACK_BOT_TOKEN
 const axios = require("axios");
 const qs = require("qs");
 const app = express();
+const { App, LogLevel } = require("@slack/bolt");
+
+const bot = new App({
+  token,
+  signingSecret: slackSigningSecret,
+  logLevel: LogLevel.DEBUG
+});
  
 // SLACKEVENTS VERSION
+const botResponses = {
+    generic: "Hello, thank you for your message. Don't forget to check the API Management Producer support Confluence page at https://nhsd-confluence.digital.nhs.uk/display/APM/API+producer+zone"
+}
+
+const channelUsers = {};
+let conversationHistory
+
 app.use('/slack/events', slackEvents.requestListener());
 
-// slackEvents.on('message', async (event) => {
-//   try {
-//     console.log(event)
-//     console.log(`Received a message event: user ${event.user} in channel ${event.channel} says ${event.text}`);
-//   } catch (e) {console.log(e)}
-// });
+slackEvents.on('message', async (event) => {
+  try {
+    console.log(event)
+    console.log(`Received a message event: user ${event.user} in channel ${event.channel} says ${event.text}`);
+
+    const currentDate = event.ts
+    const yesterdayDate = currentDate - 3600000;
+
+    const result = await bot.client.conversations.history({
+      token,
+      channel: event.channel,
+      latest: currentDate,
+      oldest: yesterdayDate
+    });
+
+    conversationHistory = result.messages;
+
+    console.log(conversationHistory)
+
+    const ephParams = {
+        token,
+        channel: "platforms-apim-producer-support",
+        text: botResponses.generic,
+        user: event.user
+      }
+    const postedResponse = await axios.post("https://slack.com/api/chat.postEphemeral", qs.stringify(ephParams));
+      // console.log(postedResponse)
+
+  } catch (e) {console.log(e)}
+});
 
 slackEvents.on('app_mention', async (event) => {
     try {
@@ -25,7 +63,7 @@ slackEvents.on('app_mention', async (event) => {
       const msgParams = {
         token,
         channel: "platforms-apim-producer-support",
-        text: "Axios test message"
+        text: botResponses.generic
       }
       const postedResponse = await axios.post("https://slack.com/api/chat.postMessage", qs.stringify(msgParams));
       console.log(postedResponse)
