@@ -11,11 +11,12 @@ const app = express();
 // SLACKEVENTS VERSION
 app.use('/slack/events', slackEvents.requestListener());
 
-slackEvents.on('message', async (event) => {
-  try {
-    console.log(`Received a message event: user ${event.user} in channel ${event.channel} says ${event.text}`);
-  } catch (e) {console.log(e)}
-});
+// slackEvents.on('message', async (event) => {
+//   try {
+//     console.log(event)
+//     console.log(`Received a message event: user ${event.user} in channel ${event.channel} says ${event.text}`);
+//   } catch (e) {console.log(e)}
+// });
 
 slackEvents.on('app_mention', async (event) => {
     try {
