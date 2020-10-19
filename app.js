@@ -1,45 +1,62 @@
-// const SlackBot = require("slackbots");
-// const { SECRET_TOKEN } = process.env;
+const express = require('express');
+const { createEventAdapter } = require('@slack/events-api');
+const slackSigningSecret = process.env.SLACK_SIGNING_SECRET;
+const slackEvents = createEventAdapter(slackSigningSecret);
+const token = process.env.SLACK_BOT_TOKEN;
+const axios = require("axios");
+const qs = require("qs");
+const { App, LogLevel } = require("@slack/bolt");
 
+const app = express();
 
-// const bot = new SlackBot({
-//     token: SECRET_TOKEN,
-//     name: "apim-helper2"
-// });
+const bot = new App({
+  token,
+  signingSecret: slackSigningSecret,
+  logLevel: LogLevel.DEBUG
+});
+ 
+const botResponses = {
+    generic: "Hello, thank you for your message. Don't forget to check the API Management Producer support Confluence page at https://nhsd-confluence.digital.nhs.uk/display/APM/API+producer+zone"
+};
 
-// const botResponses = {
-//     generic: "Hello, thank you for your message. Don't forget to check the API Management Producer support Confluence page at https://nhsd-confluence.digital.nhs.uk/display/APM/API+producer+zone"
-// }
+let conversationHistory;
 
-// const channelUsers = {};
+app.use('/slack/events', slackEvents.requestListener());
 
-// const getAndSetChannelUsers = () => {
-//     const userData = bot.getUsers();
-//     const members = userData._value.members;
-//     members.forEach((member) => {
-//         if (!channelUsers[member.id]) channelUsers[member.id] = {msgCount : 0};
-//     })
-// }
+slackEvents.on('message', async (event) => {
+  try {
+    console.log(event);
+    console.log(`Received a message event: user ${event.user} in channel ${event.channel} says ${event.text}`);
 
-// bot.on("start", () => {
-//     getAndSetChannelUsers();
-//     console.log(channelUsers);
-// });
+    const result = await bot.client.conversations.history({
+      token,
+      channel: event.channel,
+      limit: 10
+    });
 
+    conversationHistory = result.messages;
 
-// bot.on("message", (data) => {
-//     const {user, channel, type, ts} = data;
-//     const isUserMessage = user && type === "message";
+    console.log(conversationHistory);
 
-//     getAndSetChannelUsers();
-    
-//     if (isUserMessage){
-//         const {msgCount} = channelUsers[user];
+    const recentSender = conversationHistory.some((histMessage) => {
+      return histMessage.user === event.user
+    })
 
-//         if (msgCount === 0) {
-//             bot.postMessage(channel, botResponses.generic, {thread_ts: ts});
-//         }
-        
-//         channelUsers[user].msgCount++;
-//     }
-// });
+    if (!recentSender) {
+      const ephParams = {
+        token,
+        channel: "platforms-apim-producer-support",
+        text: botResponses.generic,
+        user: event.user
+      };
+      await axios.post("https://slack.com/api/chat.postEphemeral", qs.stringify(ephParams));
+    }
+
+  } catch (event) {console.log(event)}
+});
+
+slackEvents.on('error', (error) => {
+  console.log(error.name);
+});
+
+module.exports = app;
