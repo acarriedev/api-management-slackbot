@@ -34,12 +34,10 @@ slackEvents.on('message', async (event) => {
       limit: 10
     });
 
-    conversationHistory = result.messages;
+    conversationHistory = result.messages;    
 
-    console.log(conversationHistory);
-
-    const recentSender = conversationHistory.some((histMessage) => {
-      return histMessage.user === event.user
+    const recentSender = conversationHistory.some((histMessage, index) => {
+      return histMessage.user === event.user && index !== 0
     })
 
     if (!recentSender) {
