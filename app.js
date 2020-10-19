@@ -58,4 +58,4 @@ slackEvents.on('error', (error) => {
   console.log(error.name);
 });
 
-module.exports = app;
+module.exports = { app, bot };
