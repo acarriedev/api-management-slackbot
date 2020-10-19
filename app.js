@@ -1,8 +1,9 @@
 const express = require('express');
+const { slackSecret, slackBotToken } = require("./secrets");
+const slackSigningSecret = slackSecret || process.env.SLACK_SIGNING_SECRET;
+const token = slackBotToken || process.env.SLACK_BOT_TOKEN;
 const { createEventAdapter } = require('@slack/events-api');
-const slackSigningSecret = process.env.SLACK_SIGNING_SECRET;
 const slackEvents = createEventAdapter(slackSigningSecret);
-const token = process.env.SLACK_BOT_TOKEN;
 const axios = require("axios");
 const qs = require("qs");
 const { App, LogLevel } = require("@slack/bolt");
