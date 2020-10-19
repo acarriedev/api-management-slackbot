@@ -37,7 +37,7 @@ slackEvents.on('message', async (event) => {
     conversationHistory = result.messages;    
 
     const recentSender = conversationHistory.some((histMessage, index) => {
-      return histMessage.user === event.user && index !== 0
+      return histMessage.user === event.user && index !== 0;
     })
 
     if (!recentSender) {
@@ -57,4 +57,4 @@ slackEvents.on('error', (error) => {
   console.log(error.name);
 });
 
-module.exports = { app, bot };
+module.exports = app;
