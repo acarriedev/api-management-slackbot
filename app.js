@@ -44,7 +44,7 @@ slackEvents.on('message', async (event) => {
     if (!recentSender) {
       const ephParams = {
         token,
-        channel: "platforms-apim-producer-support",
+        channel: event.channel,
         text: botResponses.generic,
         user: event.user
       };
