@@ -14,7 +14,7 @@ const bot = new App({
   logLevel: LogLevel.DEBUG
 });
 const botResponses = {
-    generic: "Hi there and thanks for your message. We'll get back to you as soon as we can but you might also find an answer in our [API producer zone] https://nhsd-confluence.digital.nhs.uk/display/APM/API+producer+zone"
+    generic: "Hi there and thanks for your message. We'll get back to you as soon as we can but you might also find an answer in our <https://nhsd-confluence.digital.nhs.uk/display/APM/API+producer+zone|*API producer zone*>."
 };
 
 const app = express();
@@ -48,11 +48,11 @@ slackEvents.on('message', async (event) => {
       await axios.post("https://slack.com/api/chat.postEphemeral", qs.stringify(ephParams));
     }
 
-  } catch (event) {console.log(event)}
+  } catch (event) {console.error(event)}
 });
 
 slackEvents.on('error', (error) => {
-  console.log(error.name);
+  console.error(error.name);
 });
 
 module.exports = app;
