@@ -6,6 +6,7 @@ const { App, LogLevel } = require("@slack/bolt");
 
 const slackSigningSecret = process.env.SLACK_SIGNING_SECRET;
 const token = process.env.SLACK_BOT_TOKEN;
+const messageLimit = process.env.SLACK_MESSAGE_LIMIT || 10;
 const slackEvents = createEventAdapter(slackSigningSecret);
 
 const bot = new App({
@@ -29,7 +30,7 @@ slackEvents.on('message', async (event) => {
     const result = await bot.client.conversations.history({
       token,
       channel,
-      limit: 10 // To be changed to 100 for Implementation
+      limit: messageLimit // To be changed to 100 for Implementation
     });
 
     const conversationHistory = result.messages;    
