@@ -1,51 +1,49 @@
 const express = require('express');
-const slackSigningSecret = process.env.SLACK_SIGNING_SECRET;
-const token = process.env.SLACK_BOT_TOKEN;
-const { createEventAdapter } = require('@slack/events-api');
-const slackEvents = createEventAdapter(slackSigningSecret);
 const axios = require("axios");
 const qs = require("qs");
+const { createEventAdapter } = require('@slack/events-api');
 const { App, LogLevel } = require("@slack/bolt");
 
-const app = express();
+const slackSigningSecret = process.env.SLACK_SIGNING_SECRET;
+const token = process.env.SLACK_BOT_TOKEN;
+const slackEvents = createEventAdapter(slackSigningSecret);
 
 const bot = new App({
   token,
   signingSecret: slackSigningSecret,
   logLevel: LogLevel.DEBUG
 });
- 
 const botResponses = {
-    generic: "Hello, thank you for your message. Don't forget to check the API Management Producer support Confluence page at https://nhsd-confluence.digital.nhs.uk/display/APM/API+producer+zone"
+    generic: "Hi there and thanks for your message. We'll get back to you as soon as we can but you might also find an answer in our [API producer zone] https://nhsd-confluence.digital.nhs.uk/display/APM/API+producer+zone"
 };
 
-let conversationHistory;
+const app = express();
 
 app.use('/slack/events', slackEvents.requestListener());
 
 slackEvents.on('message', async (event) => {
   try {
-    console.log(event);
-    console.log(`Received a message event: user ${event.user} in channel ${event.channel} says ${event.text}`);
+    const { user, channel, text } = event;
+    console.log(`Received a message event: user ${user} in channel ${channel} says ${text}`);
 
     const result = await bot.client.conversations.history({
       token,
-      channel: event.channel,
-      limit: 10
+      channel,
+      limit: 10 // To be changed to 100 for Implementation
     });
 
-    conversationHistory = result.messages;    
+    const conversationHistory = result.messages;    
 
     const recentSender = conversationHistory.some((histMessage, index) => {
-      return histMessage.user === event.user && index !== 0;
-    })
+      return histMessage.user === user && index !== 0;
+    });
 
     if (!recentSender) {
       const ephParams = {
         token,
-        channel: event.channel,
+        channel,
         text: botResponses.generic,
-        user: event.user
+        user
       };
       await axios.post("https://slack.com/api/chat.postEphemeral", qs.stringify(ephParams));
     }
