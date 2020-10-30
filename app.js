@@ -27,13 +27,17 @@ slackEvents.on('message', async (event) => {
     const { user, channel, text } = event;
     console.log(`Received a message event: user ${user} in channel ${channel} says ${text}`);
 
+    console.log(event)
+
     const result = await bot.client.conversations.history({
       token,
       channel,
       limit: messageLimit
     });
 
-    const conversationHistory = result.messages;    
+    const conversationHistory = result.messages; 
+    
+    console.log(conversationHistory)
 
     const recentSender = conversationHistory.some((histMessage, index) => {
       return histMessage.user === user && index !== 0;
@@ -46,7 +50,8 @@ slackEvents.on('message', async (event) => {
         text: botResponses.generic,
         user
       };
-      await axios.post("https://slack.com/api/chat.postEphemeral", qs.stringify(ephParams));
+      const ephemeralRes = await axios.post("https://slack.com/api/chat.postEphemeral", qs.stringify(ephParams));
+      console.log(ephemeralRes)
     };
 
   } catch (event) {console.error(event)}
