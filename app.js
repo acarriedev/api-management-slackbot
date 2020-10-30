@@ -22,7 +22,7 @@ const app = express();
 
 app.use('/slack/events', slackEvents.requestListener());
 
-slackEvents.on('message', async (event) => {
+slackEvents.on('message.groups', async (event) => {
   try {
     const { user, channel, text } = event;
     console.log(`Received a message event: user ${user} in channel ${channel} says ${text}`);
