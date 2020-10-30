@@ -82,7 +82,7 @@ slackEvents.on('event_callback', async (event) => {
 })
 
 slackEvents.on('error', (error) => {
-  console.error(error.name);
+  console.error(error);
 });
 
 module.exports = app;
