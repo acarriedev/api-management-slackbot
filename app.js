@@ -76,6 +76,11 @@ slackEvents.on('message.mpim', async (event) => {
   console.log(event)
 })
 
+slackEvents.on('*', async (event) => {
+  console.log('ALL')
+  console.log(event)
+})
+
 slackEvents.on('error', (error) => {
   console.error(error.name);
 });
