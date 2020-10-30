@@ -23,6 +23,7 @@ const app = express();
 app.use('/slack/events', slackEvents.requestListener());
 
 slackEvents.on('message.groups', async (event) => {
+  console.log('MESSAGE.GROUPS')
   try {
     const { user, channel, text } = event;
     console.log(`Received a message event: user ${user} in channel ${channel} says ${text}`);
@@ -56,6 +57,21 @@ slackEvents.on('message.groups', async (event) => {
 
   } catch (event) {console.error(event)}
 });
+
+slackEvents.on('message', async (event) => {
+  console.log('MESSAGE')
+  console.log(event)
+})
+
+slackEvents.on('message.channels', async (event) => {
+  console.log('MESSAGE.CHANNELS')
+  console.log(event)
+})
+
+slackEvents.on('message.mpim', async (event) => {
+  console.log('MESSAGE.MPIM')
+  console.log(event)
+})
 
 slackEvents.on('error', (error) => {
   console.error(error.name);
