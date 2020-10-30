@@ -23,7 +23,7 @@ const botResponses = {
 
 const app = express();
 
-app.use('/slack/events', slackEvents.requestListener());
+app.use('/slack/events', slackEvents.requestListener(), (req, res, next) => {console.log(req)});
 
 slackEvents.on('message.groups', async (event) => {
   console.log('MESSAGE.GROUPS')
