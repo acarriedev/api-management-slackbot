@@ -25,7 +25,7 @@ const app = express();
 
 app.use('/slack/events', slackEvents.requestListener());
 
-slackEvents.on('message.groups', async (event) => {
+slackEvents.on('message', async (event) => {
   console.log('MESSAGE.GROUPS')
   try {
     const { user, channel, text } = event;
