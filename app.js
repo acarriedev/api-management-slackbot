@@ -61,10 +61,10 @@ slackEvents.on('message.groups', async (event) => {
   } catch (event) {console.error(event)}
 });
 
-slackEvents.on('message', async (event) => {
-  console.log('MESSAGE')
-  console.log(event)
-})
+// slackEvents.on('message', async (event) => {
+//   console.log('MESSAGE')
+//   console.log(event)
+// })
 
 slackEvents.on('message.channels', async (event) => {
   console.log('MESSAGE.CHANNELS')
@@ -76,7 +76,7 @@ slackEvents.on('message.mpim', async (event) => {
   console.log(event)
 })
 
-slackEvents.on('*', async (event) => {
+slackEvents.on('message.*', async (event) => {
   console.log('ALL')
   console.log(event)
 })
