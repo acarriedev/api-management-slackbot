@@ -40,6 +40,10 @@ slackEvents.on('message', async (event) => {
     });
 
     const conversationHistory = result.messages; 
+
+    const isThread = event.thread_ts
+
+    console.log(isThread)
     
     console.log(conversationHistory)
 
@@ -47,7 +51,7 @@ slackEvents.on('message', async (event) => {
       return histMessage.user === user && index !== 0;
     });
 
-    if (!recentSender) {
+    if (!recentSender && !isThread) {
       const ephParams = {
         token,
         channel,
@@ -60,26 +64,6 @@ slackEvents.on('message', async (event) => {
 
   } catch (event) {console.error(event)}
 });
-
-// slackEvents.on('message', async (event) => {
-//   console.log('MESSAGE')
-//   console.log(event)
-// })
-
-slackEvents.on('message.channels', async (event) => {
-  console.log('MESSAGE.CHANNELS')
-  console.log(event)
-})
-
-slackEvents.on('message.mpim', async (event) => {
-  console.log('MESSAGE.MPIM')
-  console.log(event)
-})
-
-slackEvents.on('event_callback', async (event) => {
-  console.log('Event Callback')
-  console.log(event)
-})
 
 slackEvents.on('error', (error) => {
   console.error(error);
