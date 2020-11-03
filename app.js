@@ -32,20 +32,17 @@ slackEvents.on('message', async (event) => {
     console.log(`Received a message event: user ${user} in channel ${channel} says ${text}`);
     console.log(event);
 
-    let result;
-    let conversationHistory;
-    let recentSender;
-    if (!isThread) {
-      result = await bot.client.conversations.history({
-        token,
-        channel,
-        limit: messageLimit
-      });
-      conversationHistory = result.messages;
-      recentSender = conversationHistory.some((histMessage, index) => {
-        return histMessage.user === user && index !== 0;
-      });
-    };
+    if (isThread) return
+
+    const result = await bot.client.conversations.history({
+      token,
+      channel,
+      limit: messageLimit
+    });
+    const conversationHistory = result.messages;    
+    const recentSender = conversationHistory.some((histMessage, index) => {
+      return histMessage.user === user && index !== 0;
+    });
 
     console.log("convo history", conversationHistory);
     console.log("Is thread", !recentSender && !isThread);
