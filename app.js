@@ -26,30 +26,29 @@ const app = express();
 app.use('/slack/events', slackEvents.requestListener());
 
 slackEvents.on('message', async (event) => {
-  console.log('MESSAGE.GROUPS')
   try {
     const { user, channel, text } = event;
+    const isThread = event.thread_ts;
     console.log(`Received a message event: user ${user} in channel ${channel} says ${text}`);
+    console.log(event);
 
-    console.log(event)
+    let result;
+    let conversationHistory;
+    let recentSender;
+    if (!isThread) {
+      result = await bot.client.conversations.history({
+        token,
+        channel,
+        limit: messageLimit
+      });
+      conversationHistory = result.messages;
+      recentSender = conversationHistory.some((histMessage, index) => {
+        return histMessage.user === user && index !== 0;
+      });
+    };
 
-    const result = await bot.client.conversations.history({
-      token,
-      channel,
-      limit: messageLimit
-    });
-
-    const conversationHistory = result.messages; 
-
-    const isThread = event.thread_ts
-
-    console.log(isThread)
-    
-    console.log(conversationHistory)
-
-    const recentSender = conversationHistory.some((histMessage, index) => {
-      return histMessage.user === user && index !== 0;
-    });
+    console.log("convo history", conversationHistory);
+    console.log("Is thread", !recentSender && !isThread);
 
     if (!recentSender && !isThread) {
       const ephParams = {
@@ -59,7 +58,7 @@ slackEvents.on('message', async (event) => {
         user
       };
       const ephemeralRes = await axios.post("https://slack.com/api/chat.postEphemeral", qs.stringify(ephParams));
-      console.log(ephemeralRes)
+      console.log(ephemeralRes);
     };
 
   } catch (event) {console.error(event)}
